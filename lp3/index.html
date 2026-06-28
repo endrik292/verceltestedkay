@@ -1,1 +1,677 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GravyPass - Verdienst-Quiz</title>
+  <link href="gravypass-germany_files/css2__cqH.css" rel="stylesheet">
+  <script>
+    !function (w, d, t) {
+      w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+      ttq.load('D4I643BC77UDQ79ISJDG');
+      ttq.page();
+    }(window, document, 'ttq');
+  </script>
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '26208595972078096');
+    fbq('track', 'PageView');
+    fbq('track', 'ViewContent');
+  </script>
+  <style>
+    :root {
+      --accent: #27d184;
+      --accent-glow: rgba(39,209,132,0.32);
+      --accent-dim: rgba(39,209,132,0.12);
+      --bg: #0b0e19;
+      --surface: #121622;
+      --border: rgba(139,144,163,0.18);
+      --muted: rgba(139,144,163,0.92);
+      --text: #ffffff;
+      --deep: #070a12;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      height: 100%; width: 100%; overflow: hidden;
+    }
 
+    @keyframes shimmer { 100%{ transform:translateX(100%); } }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    @keyframes popIn { 0%{transform:scale(0.9);opacity:0} 60%{transform:scale(1.03)} 100%{transform:scale(1);opacity:1} }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+    /* ── Both pages fill the viewport ── */
+    .page {
+      position: fixed; inset: 0;
+      max-width: 440px; margin: 0 auto;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      transition: opacity 0.25s ease;
+    }
+    .page.hidden { opacity: 0; pointer-events: none; }
+    .page.gone { display: none; }
+
+    /* ════════════════════════════════
+       SPLASH
+    ════════════════════════════════ */
+    .ticker-wrap {
+      overflow: hidden;
+      background: rgba(39,209,132,0.06);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 0; flex-shrink: 0;
+    }
+    .ticker-track {
+      display: flex; width: max-content;
+      animation: ticker 24s linear infinite;
+    }
+    .ticker-item {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0 20px; font-size: 12px; font-weight: 600; color: #fff;
+      white-space: nowrap; border-right: 1px solid var(--border);
+    }
+    .ticker-dollar { color: var(--accent); }
+    .ticker-amt { color: var(--accent); font-weight: 800; }
+
+    .splash-inner {
+      flex: 1; display: flex; flex-direction: column;
+      padding: 22px 22px 0;
+    }
+    .splash-hero { display: flex; flex-direction: column; gap: 10px; }
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--accent-dim); border: 1px solid rgba(39,209,132,0.35);
+      border-radius: 999px; padding: 5px 13px;
+      font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent);
+      width: fit-content;
+    }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); animation: pulse 1.4s ease-in-out infinite;
+    }
+    .splash-headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.2rem,14vw,4.6rem);
+      line-height: 0.88; letter-spacing: -0.01em;
+    }
+    .splash-headline .hi { color: var(--accent); text-shadow: 0 0 36px var(--accent-glow); }
+    .splash-sub { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* Feed */
+    .live-feed {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 12px 14px;
+      display: flex; flex-direction: column; gap: 9px;
+      margin-top: 18px;
+    }
+    .feed-hdr {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .feed-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 12px;
+    }
+    .feed-name { color: #ccc; font-weight: 600; }
+    .feed-action { color: var(--muted); font-size: 11px; }
+    .feed-amt { color: var(--accent); font-weight: 800; font-size: 13px; }
+
+    /* Stats + trust */
+    .stats-row {
+      display: flex; gap: 8px; margin-top: 18px;
+    }
+    .stat-box {
+      flex: 1; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 11px 8px; text-align: center;
+    }
+    .stat-val {
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; line-height: 1;
+      color: var(--accent); text-shadow: 0 0 14px var(--accent-glow); margin-bottom: 3px;
+    }
+    .stat-lbl { font-size: 9px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    .trust-bar {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 12px; margin-top: 10px;
+      background: var(--accent-dim); border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .trust-label { font-size: 13px; font-weight: 800; color: #fff; }
+    .trust-stars { display: flex; gap: 3px; }
+    .trust-star {
+      width: 19px; height: 19px; border-radius: 3px; background: #ffd12f;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: var(--deep);
+    }
+    .trust-name { font-size: 13px; font-weight: 700; color: var(--accent); }
+
+    /* Splash CTA */
+    .splash-cta { padding: 16px 22px 24px; flex-shrink: 0; }
+    .splash-btn {
+      display: block; width: 100%; padding: 17px;
+      background: linear-gradient(135deg,#27d184,#22c477);
+      color: var(--deep); font-family: 'DM Sans', sans-serif;
+      font-size: 16px; font-weight: 800; text-align: center;
+      border: none; border-radius: 14px; cursor: pointer;
+      box-shadow: 0 0 40px var(--accent-glow), 0 4px 20px rgba(0,0,0,0.35);
+      position: relative; overflow: hidden; transition: transform 0.12s;
+    }
+    .splash-btn::after {
+      content:''; position:absolute; inset:0;
+      background: linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
+      transform: translateX(-100%); animation: shimmer 2.2s infinite;
+    }
+    .splash-btn:active { transform: scale(0.975); }
+    .splash-sub-txt {
+      text-align: center; font-size: 10px; color: var(--muted);
+      margin-top: 8px; letter-spacing: 0.04em;
+    }
+
+    /* ════════════════════════════════
+       QUIZ
+    ════════════════════════════════ */
+    .quiz-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px 0; flex-shrink: 0;
+    }
+    .quiz-topbar-left { display: flex; flex-direction: column; gap: 1px; }
+    .quiz-eyebrow { font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .quiz-title-bar { font-size: 14px; font-weight: 800; color: #fff; }
+    .topbar-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--accent-dim); border: 1px solid rgba(39,209,132,0.35);
+      border-radius: 999px; padding: 5px 12px;
+      font-size: 11px; font-weight: 800; color: var(--accent);
+      letter-spacing: 0.04em;
+    }
+    .quiz-logo { height: 24px; width: auto; filter: brightness(0) invert(1); }
+
+    .progress-wrap { padding: 14px 22px 0; flex-shrink: 0; }
+    .progress-track {
+      height: 3px; background: var(--surface); border-radius: 99px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: var(--accent); border-radius: 99px;
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    /* Screens stack inside .quiz-body */
+    .quiz-body {
+      flex: 1; position: relative; overflow: hidden;
+      margin-top: 22px;
+    }
+    .screen {
+      position: absolute; inset: 0;
+      padding: 0 22px 0;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.28s ease, transform 0.28s ease;
+      transform: translateX(30px);
+    }
+    .screen.active {
+      opacity: 1; pointer-events: all;
+      transform: translateX(0);
+    }
+    .screen.exit {
+      opacity: 0; pointer-events: none; transform: translateX(-30px);
+      visibility: hidden;
+    }
+    #screen-loading, #screen-result {
+      overflow-y: auto;
+    }
+    #screen-loading::-webkit-scrollbar,
+    #screen-result::-webkit-scrollbar { display: none; }
+
+    /* Q content */
+    .q-eyebrow { font-size: 10px; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+    .q-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.8rem,12vw,3.6rem); line-height: 0.9;
+      letter-spacing: -0.01em; margin-bottom: 8px;
+    }
+    .q-sub { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 18px; }
+
+    .options { display: flex; flex-direction: column; gap: 12px; }
+    .opt {
+      display: flex; align-items: center; gap: 13px;
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 20px 16px;
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s, transform 0.12s;
+    }
+    .opt:active { transform: scale(0.985); }
+    .opt.selected { border-color: var(--accent); background: rgba(39,209,132,0.10); }
+    .opt-icon { font-size: 22px; flex-shrink: 0; width: 30px; text-align: center; }
+    .opt-text { flex: 1; }
+    .opt-label { font-size: 14px; font-weight: 700; color: #fff; line-height: 1.2; }
+    .opt-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .opt-check {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 1.5px solid rgba(39,209,132,0.35);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 11px; color: transparent;
+      transition: all 0.18s;
+    }
+    .opt.selected .opt-check {
+      background: var(--accent); border-color: var(--accent);
+      color: var(--deep); box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    /* Review card shown on Q1 */
+    .q-review {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 13px 15px; margin-top: 12px;
+    }
+    .qr-stars { color: #ffd12f; font-size: 12px; letter-spacing: 2px; margin-bottom: 5px; }
+    .qr-text { font-size: 12px; color: #ccc; line-height: 1.5; margin-bottom: 4px; font-style: italic; }
+    .qr-name { font-size: 10px; font-weight: 700; color: var(--muted); }
+
+    /* Quiz footer - fixed at bottom of quiz page */
+    .quiz-footer {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 22px 20px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .qf-stat { text-align: center; }
+    .qf-val { font-size: 13px; font-weight: 800; color: var(--accent); }
+    .qf-lbl { font-size: 9px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+    .qf-div { width: 1px; height: 26px; background: var(--border); }
+
+    /* Loading */
+    #screen-loading { align-items: center; justify-content: center; text-align: center; }
+    .loading-orb {
+      width: 60px; height: 60px; border-radius: 50%;
+      border: 2px solid var(--border); border-top-color: var(--accent);
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 16px; box-shadow: 0 0 24px var(--accent-glow);
+    }
+    .loading-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; margin-bottom: 18px; }
+    .ls-list { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 240px; }
+    .ls { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
+    .ls-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0; transition: background 0.3s; }
+    .ls.done .ls-dot { background: var(--accent); box-shadow: 0 0 6px var(--accent-glow); }
+    .ls.done { color: #fff; }
+
+    /* Result */
+    #screen-result { gap: 10px; }
+    .result-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(39,209,132,0.14); border: 1px solid rgba(39,209,132,0.38);
+      border-radius: 999px; padding: 5px 14px;
+      font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+    }
+    .result-headline { font-size: 21px; font-weight: 800; color: #fff; line-height: 1.2; }
+
+    .est-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px; text-align: center;
+      animation: popIn 0.45s ease both;
+    }
+    .est-lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+    .est-amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.6rem,12vw,3.6rem); line-height: 1;
+      color: var(--accent); text-shadow: 0 0 32px var(--accent-glow); margin-bottom: 2px;
+    }
+    .est-period { font-size: 12px; color: var(--muted); }
+
+    .boost-card {
+      background: linear-gradient(135deg,rgba(39,209,132,0.14),rgba(39,209,132,0.04));
+      border: 1.5px solid rgba(39,209,132,0.36);
+      border-radius: 16px; padding: 16px; text-align: center;
+      animation: popIn 0.45s 0.15s ease both; opacity: 0; animation-fill-mode: both;
+      position: relative; overflow: hidden;
+    }
+    .boost-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background: linear-gradient(90deg,transparent,var(--accent),transparent);
+    }
+    .boost-top { font-size: 10px; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); margin-bottom: 9px; }
+    .boost-chips { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 9px; }
+    .chip { display: inline-flex; align-items: center; background: var(--accent); color: var(--deep); font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; }
+    .chip.outline { background: transparent; border: 1px solid rgba(39,209,132,0.42); color: var(--accent); }
+    .boost-amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.6rem,12vw,3.6rem); line-height: 1;
+      color: #fff; text-shadow: 0 0 28px var(--accent-glow); margin-bottom: 12px;
+    }
+    .boost-divider { display: flex; align-items: center; gap: 8px; font-size: 9px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 9px; }
+    .boost-divider::before,.boost-divider::after { content:''; flex:1; height:1px; background:rgba(39,209,132,0.18); }
+    .boost-how { font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.55; }
+    .boost-how b { color: #fff; font-weight: 700; }
+    .boost-how strong { color: var(--accent); font-weight: 700; }
+
+    .result-cta { flex-shrink: 0; }
+    .cta-spots { text-align: center; font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+    .cta-btn {
+      display: block; width: 100%; padding: 17px;
+      background: linear-gradient(135deg,#27d184,#22c477);
+      color: var(--deep); font-family: 'DM Sans', sans-serif;
+      font-size: 16px; font-weight: 800; text-align: center;
+      border: none; border-radius: 14px; cursor: pointer;
+      box-shadow: 0 0 40px var(--accent-glow), 0 4px 20px rgba(0,0,0,0.35);
+      position: relative; overflow: hidden; transition: transform 0.12s;
+    }
+    .cta-btn::after {
+      content:''; position:absolute; inset:0;
+      background: linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
+      transform: translateX(-100%); animation: shimmer 2.2s infinite;
+    }
+    .cta-btn:active { transform: scale(0.975); }
+    .cta-sub { text-align: center; font-size: 10px; color: var(--muted); margin-top: 7px; letter-spacing: 0.04em; }
+  </style>
+</head>
+<body cz-shortcut-listen="true">
+
+<!-- ══ SPLASH PAGE ══ -->
+<div class="page" id="pageSplash">
+  <div class="ticker-wrap">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+  <div class="splash-inner">
+    <div class="splash-hero">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div class="live-badge"><div class="live-dot"></div>Live-Auszahlungen</div>
+        <div class="live-badge" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.12);color:#fff;">⚡ Ohne App</div>
+      </div>
+      <div class="splash-headline">Dein Handy<br><span class="hi">bezahlt dich.</span></div>
+      <p class="splash-sub">Teste Apps &amp; Spiele. Auszahlung per PayPal. Ohne App</p>
+    </div>
+
+    <div class="live-feed">
+      <div class="feed-hdr"><div class="live-dot"></div>Live Auszahlungen</div>
+      <div id="feedList"></div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-val">1,3 Mio.</div><div class="stat-lbl">Mitglieder</div></div>
+      <div class="stat-box"><div class="stat-val">100 Mio. €</div><div class="stat-lbl">Ausgezahlt</div></div>
+      <div class="stat-box"><div class="stat-val">4,7★</div><div class="stat-lbl">Bewertung</div></div>
+    </div>
+
+    <div class="trust-bar">
+      <div class="trust-label">Exzellent</div>
+      <div class="trust-stars">
+        <div class="trust-star">★</div><div class="trust-star">★</div><div class="trust-star">★</div><div class="trust-star">★</div><div class="trust-star">★</div>
+      </div>
+      <div class="trust-name">Trustpilot</div>
+    </div>
+  </div>
+
+  <div class="splash-cta">
+    <button class="splash-btn" onclick="startQuiz()">VERDIENST CHECKEN →</button>
+    <p class="splash-sub-txt">Gratis · 30 Sekunden · Keine Kreditkarte</p>
+  </div>
+</div>
+
+<!-- ══ QUIZ PAGE ══ -->
+<div class="page hidden gone" id="pageQuiz">
+  <div class="quiz-topbar">
+    <div class="quiz-topbar-left">
+      <div class="quiz-eyebrow">Verdienst-Quiz</div>
+      <div class="quiz-title-bar">Deine Schätzung</div>
+    </div>
+    <div class="topbar-badge">⚡ 60 Sek.</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progress" style="width:5%"></div></div>
+  </div>
+
+  <div class="quiz-body">
+
+    <!-- Q1 -->
+    <div class="screen active" id="screen-q1">
+      <div class="q-eyebrow">Frage 1 von 3</div>
+      <div class="q-title">Welches Handy<br>nutzt du?</div>
+      <p class="q-sub">Damit finden wir passende Angebote.</p>
+      <div class="options">
+        <div class="opt" data-q="1" data-val="ios" onclick="pick(this)">
+          <div class="opt-icon">🍎</div>
+          <div class="opt-text"><div class="opt-label">iPhone</div><div class="opt-hint">Apple Wallet</div></div>
+          <div class="opt-check">✓</div>
+        </div>
+        <div class="opt" data-q="1" data-val="android" onclick="pick(this)">
+          <div class="opt-icon">🤖</div>
+          <div class="opt-text"><div class="opt-label">Android</div><div class="opt-hint">Google Wallet</div></div>
+          <div class="opt-check">✓</div>
+        </div>
+      </div>
+      <div class="q-review">
+        <div class="qr-stars">★★★★★</div>
+        <div class="qr-text">"340 € in der ersten Woche. Geglaubt habe ich es erst als ich es auf PayPal bekommen habe."</div>
+        <div class="qr-name">- Priya S., verifiziertes Mitglied</div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="screen" id="screen-q2">
+      <div class="q-eyebrow">Frage 2 von 3</div>
+      <div class="q-title">Aus 50 €<br>500€ machen<br>diese Woche?</div>
+      <p class="q-sub">Schalte durch kleine In-App-Käufe bessere Angebote frei?.</p>
+      <div class="options">
+        <div class="opt" data-q="2" data-val="yes" onclick="pick(this)">
+          <div class="opt-icon">🚀</div>
+          <div class="opt-text"><div class="opt-label">Ja, ich bin dabei</div><div class="opt-hint">Boosts über In-App-Angebote</div></div>
+          <div class="opt-check">✓</div>
+        </div>
+        <div class="opt" data-q="2" data-val="maybe" onclick="pick(this)">
+          <div class="opt-icon">🤔</div>
+          <div class="opt-text"><div class="opt-label">Vielleicht</div><div class="opt-hint">Zeig mir erst, wie es geht</div></div>
+          <div class="opt-check">✓</div>
+        </div>
+        <div class="opt" data-q="2" data-val="no" onclick="pick(this)">
+          <div class="opt-icon">🆓</div>
+          <div class="opt-text"><div class="opt-label">Nur gratis Angebote</div><div class="opt-hint">Kein Einsatz · niedrigeres Level</div></div>
+          <div class="opt-check">✓</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="screen" id="screen-q3">
+      <div class="q-eyebrow">Frage 3 von 3</div>
+      <div class="q-title">Wie viel<br>Zeit hast du<br>täglich?</div>
+      <p class="q-sub">Mehr Zeit bedeutet mehr Angebote.</p>
+      <div class="options">
+        <div class="opt" data-q="3" data-val="low" onclick="pick(this)">
+          <div class="opt-icon">⚡</div>
+          <div class="opt-text"><div class="opt-label">Unter 30 Min.</div><div class="opt-hint">Kurz rein · 2-3 Angebote täglich</div></div>
+          <div class="opt-check">✓</div>
+        </div>
+        <div class="opt" data-q="3" data-val="mid" onclick="pick(this)">
+          <div class="opt-icon">⏱️</div>
+          <div class="opt-text"><div class="opt-label">30 Min. - 2 Std.</div><div class="opt-hint">Solide · 4-6 Angebote täglich</div></div>
+          <div class="opt-check">✓</div>
+        </div>
+        <div class="opt" data-q="3" data-val="high" onclick="pick(this)">
+          <div class="opt-icon">🔥</div>
+          <div class="opt-text"><div class="opt-label">2+ Stunden</div><div class="opt-hint">Maximal · volles Angebot freigeschaltet</div></div>
+          <div class="opt-check">✓</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="screen" id="screen-loading">
+      <div class="loading-orb"></div>
+      <div class="loading-title">Schätzung läuft...</div>
+      <div class="ls-list">
+        <div class="ls" id="ls1"><div class="ls-dot"></div><span>Angebote abgleichen</span></div>
+        <div class="ls" id="ls2"><div class="ls-dot"></div><span>Basis-Verdienst berechnen</span></div>
+        <div class="ls" id="ls3"><div class="ls-dot"></div><span>Boost anwenden</span></div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="screen" id="screen-result">
+      <div class="result-badge">✓ Schätzung bereit</div>
+      <div class="result-headline">Das kannst du verdienen</div>
+      <div class="est-card">
+        <div class="est-lbl">Deine Schätzung</div>
+        <div class="est-amount" id="baseAmount">135-480 €</div>
+        <div class="est-period">täglich</div>
+      </div>
+      <div class="boost-card">
+        <div class="boost-top">Boost-Verdienst verfügbar</div>
+        <div class="boost-chips">
+          <div class="chip">Täglich</div>
+          <div class="chip outline">⏱ Limitiert</div>
+        </div>
+        <div class="boost-amount" id="boostAmount">297-1.152 €</div>
+        <div class="boost-divider">So machst du mit</div>
+        <div class="boost-how" id="boostHow">Gib <b>10 € in einer App deiner Wahl aus</b> und erhalte <strong>100 € zurück</strong>. Wie eine Umbuchung, nicht wie Kosten.</div>
+      </div>
+      <div class="result-cta">
+        <div class="cta-spots">JETZT STARTEN · PLÄTZE LIMITIERT</div>
+        <button class="cta-btn" id="resultCta">App herunterladen</button>
+        <p class="cta-sub">Keine Kreditkarte · Sofort-Bonus</p>
+      </div>
+    </div>
+
+  </div><!-- /quiz-body -->
+
+  <div class="quiz-footer" id="quizFooter">
+    <div class="qf-stat"><div class="qf-val">1,3 Mio.</div><div class="qf-lbl">Mitglieder</div></div>
+    <div class="qf-div"></div>
+    <div class="qf-stat"><div class="qf-val">100 Mio. €</div><div class="qf-lbl">Ausgezahlt</div></div>
+    <div class="qf-div"></div>
+    <div class="qf-stat"><div class="qf-val">4,7★</div><div class="qf-lbl">Bewertung</div></div>
+  </div>
+
+</div><!-- /pageQuiz -->
+
+<script>
+  var OFFER_LINK = 'https://globalvisitlog.com/cf/click';
+  function affiliateLinkWithSource(source) {
+    if(!source) return OFFER_LINK;
+    return OFFER_LINK + '?source_id=' + encodeURIComponent(source);
+  }
+
+  var sourceParam = new URLSearchParams(window.location.search).get('source');
+  if(sourceParam){
+    window.location.href = affiliateLinkWithSource(sourceParam);
+  }
+
+  var answers = {};
+  var earningsTable = {
+    yes:   { base:'135-480 €', boost:'297-1.152 €' },
+    maybe: { base:'90-320 €',  boost:'220-860 €'   },
+    no:    { base:'40-120 €',  boost:'135-480 €'   }
+  };
+
+  // Ticker
+  var cashouts = [
+    {name:'Maria',amt:'128 €'},{name:'Tyler',amt:'75 €'},{name:'Jade',amt:'210 €'},
+    {name:'Lewis',amt:'95 €'},{name:'Priya',amt:'340 €'},{name:'Marcus',amt:'60 €'},
+    {name:'Sophie',amt:'185 €'},{name:'Aiden',amt:'420 €'},{name:'Chloe',amt:'110 €'},
+    {name:'Devon',amt:'250 €'},{name:'Kezia',amt:'88 €'},{name:'Finn',amt:'162 €'},
+  ];
+  (function(){
+    var track = document.getElementById('tickerTrack');
+    cashouts.concat(cashouts).forEach(function(c){
+      var el = document.createElement('div');
+      el.className = 'ticker-item';
+      el.innerHTML = '<span class="ticker-dollar">€</span><span>' + c.name + ' hat <span class="ticker-amt">' + c.amt + '</span> ausgezahlt</span>';
+      track.appendChild(el);
+    });
+  })();
+
+  // Feed
+  var feedData = [
+    {name:'Maria K.',amt:'128 €',ago:'vor 2 Min.'},
+    {name:'Tyler J.',amt:'75 €',ago:'vor 5 Min.'},
+    {name:'Priya S.',amt:'340 €',ago:'vor 9 Min.'},
+    {name:'Lewis M.',amt:'95 €',ago:'vor 12 Min.'},
+  ];
+  (function(){
+    var list = document.getElementById('feedList');
+    feedData.forEach(function(r){
+      var el = document.createElement('div');
+      el.className = 'feed-row';
+      el.innerHTML = '<span class="feed-name">'+r.name+'</span><span class="feed-action">ausgezahlt</span><span class="feed-amt">'+r.amt+'</span>';
+      list.appendChild(el);
+    });
+  })();
+
+  function startQuiz() {
+    var splash = document.getElementById('pageSplash');
+    var quiz   = document.getElementById('pageQuiz');
+    splash.classList.add('hidden');
+    quiz.classList.remove('gone');
+    quiz.classList.remove('hidden');
+    setTimeout(function(){ splash.classList.add('gone'); }, 300);
+  }
+
+  function setProgress(pct){ document.getElementById('progress').style.width = pct+'%'; }
+
+  var currentScreen = 'q1';
+  function showScreen(id){
+    var old = document.getElementById('screen-' + currentScreen);
+    if(old){ old.classList.remove('active'); old.classList.add('exit'); setTimeout(function(){ old.classList.remove('exit'); },300); }
+    var next = document.getElementById('screen-' + id);
+    next.classList.add('active');
+    currentScreen = id;
+    // hide footer on loading/result
+    var footer = document.getElementById('quizFooter');
+    footer.style.display = (id==='loading'||id==='result') ? 'none' : 'flex';
+  }
+
+  function pick(el){
+    var q = el.dataset.q, val = el.dataset.val;
+    el.closest('.options').querySelectorAll('.opt').forEach(function(o){ o.classList.remove('selected'); });
+    el.classList.add('selected');
+    answers['q'+q] = val;
+    setTimeout(function(){ advance(parseInt(q)); }, 260);
+  }
+
+  function advance(q){
+    if(q===1){ showScreen('q2'); setProgress(36); }
+    else if(q===2){ showScreen('q3'); setProgress(68); }
+    else if(q===3){ setProgress(88); showScreen('loading'); runLoader(); }
+  }
+
+  function runLoader(){
+    var steps=['ls1','ls2','ls3'], i=0;
+    function tick(){ if(i<steps.length){ document.getElementById(steps[i]).classList.add('done'); i++; setTimeout(tick,650); } else setTimeout(showResult,350); }
+    setTimeout(tick,350);
+  }
+
+  function showResult(){
+    var spend = answers.q2||'yes';
+    var row = earningsTable[spend];
+    document.getElementById('baseAmount').textContent  = row.base;
+    document.getElementById('boostAmount').textContent = row.boost;
+    if(spend==='no'){
+      document.getElementById('boostHow').innerHTML = 'Schalte dieses Level mit <b>nur einem In-App-Kauf</b> frei: <b>10 € ausgeben</b>, <strong>100 €+ zurück</strong>.';
+    }
+    setProgress(100);
+    showScreen('result');
+  }
+
+  document.getElementById('resultCta').addEventListener('click',function(){
+    if(window.ttq && typeof window.ttq.track === 'function'){
+      window.ttq.track('ClickButton');
+    }
+    window.location.href = affiliateLinkWithSource(sourceParam);
+  });
+</script>
+
+</body></html>
