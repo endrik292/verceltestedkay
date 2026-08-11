@@ -402,7 +402,7 @@ function goAffiliate(btn) {
     btn.innerHTML = '<svg class="spin" style="width:20px;height:20px;animation:spin 1s linear infinite" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.75"/></svg> Öffnet...';
   }
   try { if (window.ttq) ttq.track('ClickButton'); } catch(e){}
-  var url = 'https://rdr.gtrx.org/aff_c?offer_id=3973&aff_id=19388';
+  var url = 'https://rdr.gtrx.org/aff_c?offer_id=3973&aff_id=19388&source=direct';
   var src = new URLSearchParams(window.location.search).get('source');
   if (src) url += (url.indexOf('?') > -1 ? '&' : '?') + 'source=' + encodeURIComponent(src);
   window.location.href = url;
