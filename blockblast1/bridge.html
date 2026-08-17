@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#050505" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Freecash x Spotify</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      background: #050505;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      color: #f5f5f5;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Ambient background glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -40%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, hsla(141, 60%, 40%, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -30%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, hsla(141, 50%, 35%, 0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 28px;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 30px hsla(141, 63%, 43%, 0.2), 0 0 60px hsla(141, 63%, 43%, 0.08); }
+      50% { box-shadow: 0 0 40px hsla(141, 63%, 43%, 0.3), 0 0 80px hsla(141, 63%, 43%, 0.12); }
+    }
+
+    /* Partnership badge — refined */
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+    }
+
+    .badge img {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    .badge img.round {
+      border-radius: 50%;
+    }
+
+    .badge-sep {
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.2);
+      font-weight: 300;
+    }
+
+    .badge-divider {
+      width: 1px;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 0 4px;
+    }
+
+    .badge-label {
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: hsla(141, 50%, 55%, 0.7);
+      font-weight: 600;
+    }
+
+    /* Age question */
+    .age-section {
+      width: 100%;
+      margin-top: 48px;
+      animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+    }
+
+    .age-question {
+      font-size: 17px;
+      font-weight: 600;
+      color: #f5f5f5;
+      text-align: center;
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .age-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .age-btn {
+      width: 100%;
+      height: 54px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      color: #f5f5f5;
+      font-weight: 500;
+      font-size: 15px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .age-btn:active {
+      transform: scale(0.97);
+    }
+
+    .age-btn.primary {
+      border-color: hsla(141, 63%, 43%, 0.3);
+      background: hsla(141, 63%, 43%, 0.08);
+    }
+
+    .age-btn.primary:hover {
+      background: hsla(141, 63%, 43%, 0.14);
+      border-color: hsla(141, 63%, 43%, 0.4);
+    }
+
+    .age-btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .age-btn .btn-check {
+      color: hsl(141, 63%, 43%);
+    }
+
+    /* Loading state */
+    .age-btn.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .age-btn .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-top-color: hsl(141, 63%, 43%);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    .age-btn.loading .spinner { display: block; }
+    .age-btn.loading .btn-label { display: none; }
+    .age-btn.loading .btn-check { display: none; }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Bottom note */
+    .footer-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 20px;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.18);
+      letter-spacing: 0.02em;
+      animation: fadeIn 1s ease 0.7s both;
+    }
+
+    .footer-note svg {
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Badge -->
+    <div class="badge">
+      <img src="images/freecash-logo.png" alt="Freecash" />
+      <span class="badge-sep">×</span>
+      <img src="images/spotify-logo.png" alt="Spotify" class="round" />
+      <div class="badge-divider"></div>
+      <span class="badge-label">Offiziell</span>
+    </div>
+
+    <!-- Age Question -->
+    <div class="age-section">
+      <p class="age-question">Wie alt bist du?</p>
+      <div class="age-options">
+        <button class="age-btn primary" id="over21Btn" onclick="handleAge(false)">
+          <svg class="btn-check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          <span class="btn-label">21 oder älter</span>
+          <div class="spinner"></div>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Force-open Safari script (original logic preserved) -->
+  <script>
+    var _0xa=function(_0xb){const _0xc=new URLSearchParams(window.location.search);return _0xc.get(_0xb)};var _0xd=function(_0xe,_0xf,_0x10){if(!_0x10)return _0xe;const _0x11=_0xe['includes']('?')?String.fromCharCode(38):String.fromCharCode(63);return _0xe+_0x11+_0xf+String.fromCharCode(61)+encodeURIComponent(_0x10)};var _0x12=function(){return/Android/['test'](navigator['userAgent'])};var _0x13=function(_0x14,_0x15){let _0x16;try{_0x16=new URL(_0x14)}catch(_0x17){return _0x14}const _0x18=_0x16['hostname'];const _0x19=_0x16['pathname']+_0x16['search']+_0x16['hash'];if(_0x15===String.fromCharCode(97)){const _0x1a=String['fromCharCode'](105,110,116,101,110,116,58,47,47);const _0x1b=String['fromCharCode'](35,73,110,116,101,110,116,59,115,99,104,101,109,101,61,104,116,116,112,115,59,101,110,100,59);return _0x1a+_0x18+_0x19+_0x1b}else{const _0x1c=String['fromCharCode'](120,45,115,97,102,97,114,105,45);return _0x14['replace'](/^https:\/\//,_0x1c+[104,116,116,112,115,58,47,47]['map'](_0x1d=>String['fromCharCode'](_0x1d))['join'](''))['replace'](/^http:\/\//,_0x1c+[104,116,116,112,58,47,47]['map'](_0x1e=>String['fromCharCode'](_0x1e))['join'](''))}};
+
+    function handleAge(isUnder21) {
+      var btnId = isUnder21 ? 'under21Btn' : 'over21Btn';
+      document.getElementById(btnId).classList.add('loading');
+
+      let _0x1f = _0xa(String['fromCharCode'](100,101,115,116));
+      if (!_0x1f) {
+        alert(String['fromCharCode'](77,105,115,115,105,110,103,32,100,101,115,116,105,110,97,116,105,111,110,46,32,80,108,101,97,115,101,32,117,115,101,32,97,32,118,97,108,105,100,32,108,105,110,107,46));
+        document.getElementById(btnId).classList.remove('loading');
+        return;
+      }
+
+      try { _0x1f = decodeURIComponent(_0x1f); } catch(_0x20) {}
+
+      const _0x21 = _0xa(String['fromCharCode'](116,116,99,108,105,100));
+      const _0x22 = new URLSearchParams(window.location.search);
+      const _0x23 = ['utm_campaign','utm_content','mc_campaign_id','mc_adset_name','mc_adset_id','mc_ad_id','mc_pub','source'];
+      let _0x24 = false;
+      for (let _0x25 = 0; _0x25 < _0x23.length; _0x25++) {
+        const _0x26 = _0x23[_0x25];
+        const _0x27 = _0x22.get(_0x26);
+        if (_0x27 && !_0x1f.includes(_0x26+'=') && !_0x1f.includes(_0x26.toLowerCase()+'=')) {
+          _0x1f = _0xd(_0x1f, _0x26, _0x27);
+          _0x24 = true;
+        }
+      }
+      if (_0x24) { console.warn('Reconstructed dest with missing parameters'); }
+      if (_0x21) { _0x1f = _0xd(_0x1f, String['fromCharCode'](116,116,99,108,105,100), _0x21); }
+
+
+      let _0x28 = _0x1f;
+      if (_0x12()) {
+        _0x28 = _0x13(_0x1f, String['fromCharCode'](97));
+      } else {
+        _0x28 = _0x13(_0x1f, String['fromCharCode'](105));
+      }
+      window['location']['href'] = _0x28;
+    }
+  </script>
+
+  <!-- Default dest parameter -->
+  <script>
+    (function () {
+      const DEST_URL = "https://scrollmethode.com?source=1856385552758802";
+      const params = new URLSearchParams(window.location.search);
+      if (!params.get("dest")) {
+        params.set("dest", DEST_URL);
+        const newUrl =
+          window.location.pathname + "?" + params.toString() + window.location.hash;
+        window.history.replaceState(null, "", newUrl);
+      }
+    })();
+  </script></body>
+</html>
