@@ -1,0 +1,258 @@
+<!DOCTYPE html><html lang="de"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#050505">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>TikTok</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      background: #050505;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      color: #f5f5f5;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      padding: 0 28px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .age-btn {
+      width: 100%;
+      height: 54px;
+      border: 1px solid hsla(145, 100%, 42%, 0.3);
+      border-radius: 14px;
+      background: #00D658;
+      color: #000;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .age-btn:active {
+      transform: scale(0.97);
+    }
+
+    .age-btn:hover {
+      background: #00e060;
+    }
+
+    .age-btn.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .age-btn .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(0, 0, 0, 0.2);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    .age-btn.loading .spinner { display: block; }
+    .age-btn.loading .btn-label { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button class="age-btn" id="over21Btn" onclick="handleAge(false)">
+      <span class="btn-label">Fortfahren</span>
+      <div class="spinner"></div>
+    </button>
+  </div>
+
+  <script>
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    function appendQuery(url, key, value) {
+      if (!value) return url;
+      const separator = url.includes("?") ? "&" : "?";
+      return url + separator + key + "=" + encodeURIComponent(value);
+    }
+
+    function isInApp() {
+      return /(Instagram|FBAN|FBAV|Messenger|Line|Snapchat|TikTok|Pinterest|WeChat|LinkedInApp|InApp|WebView|wv)/i.test(navigator.userAgent);
+    }
+
+    function isAndroid() {
+      return /Android/i.test(navigator.userAgent);
+    }
+
+    function isIOS() {
+      return /(iPhone|iPod|iPad)/i.test(navigator.userAgent);
+    }
+
+    function isInstagram() {
+      return /instagram[ ]?([\w.]+)/i.test(navigator.userAgent.toLowerCase());
+    }
+
+    function toNativeBrowserUrl(targetUrl) {
+      let parsedUrl;
+
+      try {
+        parsedUrl = new URL(targetUrl);
+      } catch (error) {
+        return "";
+      }
+
+      const withoutProtocol = parsedUrl.href.replace(/^https?:\/\//, "");
+
+      if (isIOS()) {
+        if (isInstagram()) {
+          return "instagram://extbrowser/?url=" + encodeURIComponent(parsedUrl.href);
+        }
+
+        return parsedUrl.href.replace(/^https:\/\//, "x-safari-https://").replace(/^http:\/\//, "x-safari-http://");
+      }
+
+      if (isAndroid()) {
+        return "intent://" + withoutProtocol + "#Intent;scheme=" + parsedUrl.protocol.replace(":", "") + ";end";
+      }
+
+      return "";
+    }
+
+    function openInNativeBrowser(targetUrl) {
+      const nativeUrl = toNativeBrowserUrl(targetUrl);
+
+      if (!nativeUrl || !isInApp()) {
+        window.location.href = targetUrl;
+        return;
+      }
+
+      const fallback = setTimeout(function () {
+        window.location.href = targetUrl;
+      }, 3000);
+
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) clearTimeout(fallback);
+      });
+
+      window.addEventListener("blur", function () {
+        clearTimeout(fallback);
+      });
+
+      window.location.href = nativeUrl;
+    }
+
+    function getTargetUrl(isUnder21) {
+      let targetUrl = getParam("dest");
+
+      if (!targetUrl) {
+        return "";
+      }
+
+      try {
+        targetUrl = decodeURIComponent(targetUrl);
+      } catch (error) {}
+
+      const params = new URLSearchParams(window.location.search);
+      const passthroughParams = [
+        "ad_id",
+        "adset_id",
+        "campaign_id",
+        "ad_name",
+        "adset_name",
+        "campaign_name",
+        "source",
+        "placement",
+        "click_id",
+        "email",
+        "ttclid",
+        "fbclid",
+        "utm_source",
+        "utm_medium",
+        "utm_campaign",
+        "utm_content",
+        "utm_term",
+        "mc_campaign_id",
+        "mc_adset_name",
+        "mc_adset_id",
+        "mc_ad_id",
+        "mc_pub"
+      ];
+
+      for (let i = 0; i < passthroughParams.length; i++) {
+        const key = passthroughParams[i];
+        const value = params.get(key);
+
+        if (value && !targetUrl.includes(key + "=") && !targetUrl.includes(key.toLowerCase() + "=")) {
+          targetUrl = appendQuery(targetUrl, key, value);
+        }
+      }
+
+      if (isUnder21) {
+        targetUrl = appendQuery(targetUrl, "under21", "1");
+      }
+
+      if (!targetUrl.includes("iar=")) {
+        targetUrl = appendQuery(targetUrl, "iar", "inappredirect");
+      }
+
+      return targetUrl;
+    }
+
+    function handleAge(isUnder21) {
+      const btnId = isUnder21 ? "under21Btn" : "over21Btn";
+      const button = document.getElementById(btnId);
+      button.classList.add("loading");
+
+      const targetUrl = getTargetUrl(isUnder21);
+
+      if (!targetUrl) {
+        alert("Missing destination. Please use a valid link.");
+        button.classList.remove("loading");
+        return;
+      }
+
+      openInNativeBrowser(targetUrl);
+    }
+  </script>
+
+  <script>
+    (function () {
+      const DEST_URL = "https://appmethode.com/tanken4/";
+      const params = new URLSearchParams(window.location.search);
+      if (!params.get("dest")) {
+        params.set("dest", DEST_URL);
+        const newUrl =
+          window.location.pathname + "?" + params.toString() + window.location.hash;
+        window.history.replaceState(null, "", newUrl);
+      }
+    })();
+  </script>
+</body></html>
