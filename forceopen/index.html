@@ -181,39 +181,15 @@
       } catch (error) {}
 
       const params = new URLSearchParams(window.location.search);
-      const passthroughParams = [
-        "ad_id",
-        "adset_id",
-        "campaign_id",
-        "ad_name",
-        "adset_name",
-        "campaign_name",
-        "source",
-        "placement",
-        "click_id",
-        "email",
-        "ttclid",
-        "fbclid",
-        "utm_source",
-        "utm_medium",
-        "utm_campaign",
-        "utm_content",
-        "utm_term",
-        "mc_campaign_id",
-        "mc_adset_name",
-        "mc_adset_id",
-        "mc_ad_id",
-        "mc_pub"
-      ];
-
-      for (let i = 0; i < passthroughParams.length; i++) {
-        const key = passthroughParams[i];
-        const value = params.get(key);
+      params.forEach(function (value, key) {
+        if (key === "dest" || key === "iar" || key === "under21") {
+          return;
+        }
 
         if (value && !targetUrl.includes(key + "=") && !targetUrl.includes(key.toLowerCase() + "=")) {
           targetUrl = appendQuery(targetUrl, key, value);
         }
-      }
+      });
 
       if (isUnder21) {
         targetUrl = appendQuery(targetUrl, "under21", "1");
@@ -245,7 +221,7 @@
 
   <script>
     (function () {
-      const DEST_URL = "https://appmethode.com/tanken2/";
+      const DEST_URL = "https://appmethode.com/tanken4/";
       const params = new URLSearchParams(window.location.search);
       if (!params.get("dest")) {
         params.set("dest", DEST_URL);
