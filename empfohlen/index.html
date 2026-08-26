@@ -66,7 +66,7 @@ img, svg {
   --background: #060810;
   --foreground: #f0f0f5;
   --muted-foreground: #8a8a9a;
-  --green: #22C55E;
+  --accent: #3B82F6;
   --red: #EF4444;
 }
 
@@ -121,7 +121,7 @@ body {
 .animate-scale-in { animation: scaleIn 0.25s ease both; }
 
 .fc-btn-primary {
-  background: linear-gradient(135deg, #16a34a 0%, #22C55E 40%, #22C55E 70%, #16a34a 100%);
+  background: linear-gradient(135deg, #1D4ED8 0%, #3B82F6 40%, #3B82F6 70%, #1D4ED8 100%);
   background-size: 250% 250%;
   color: white;
   font-weight: 800;
@@ -129,12 +129,12 @@ body {
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 0 30px rgba(34,197,94,.3), 0 4px 20px rgba(34,197,94,.2);
+  box-shadow: 0 0 30px rgba(59,130,246,.32), 0 4px 20px rgba(59,130,246,.22);
   animation: shimmer 4s ease infinite;
   font-family: inherit;
 }
 .fc-btn-primary:hover {
-  box-shadow: 0 0 40px rgba(34,197,94,.5), 0 4px 24px rgba(34,197,94,.3);
+  box-shadow: 0 0 40px rgba(59,130,246,.5), 0 4px 24px rgba(59,130,246,.32);
   transform: translateY(-1px);
 }
 .fc-btn-primary:active {
@@ -150,7 +150,7 @@ body {
 .page-bg {
   min-height: 100vh;
   position: relative;
-  background: radial-gradient(ellipse 60% 30% at 50% 0%, rgba(34,197,94,0.05) 0%, transparent 60%), #060810;
+  background: radial-gradient(ellipse 60% 30% at 50% 0%, rgba(59,130,246,0.07) 0%, transparent 60%), #060810;
 }
 
 /* Glow */
@@ -159,12 +159,12 @@ body {
 }
 .glow1 {
   width: 600px; height: 600px; border-radius: 50%; position: absolute; top: -300px; right: -250px;
-  background: radial-gradient(circle, rgba(34,197,94,0.12) 0%, rgba(34,197,94,0.03) 35%, transparent 60%);
+  background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, rgba(59,130,246,0.03) 35%, transparent 60%);
   opacity: 0.8; animation: float1 16s ease-in-out infinite; transform: translateZ(0);
 }
 .glow2 {
   width: 500px; height: 500px; border-radius: 50%; position: absolute; bottom: -200px; left: -300px;
-  background: radial-gradient(circle, rgba(34,197,94,0.08) 0%, rgba(16,185,129,0.02) 35%, transparent 60%);
+  background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, rgba(96,165,250,0.03) 35%, transparent 60%);
   opacity: 0.7; animation: float2 20s ease-in-out infinite; transform: translateZ(0);
 }
 
@@ -177,19 +177,19 @@ body {
 .pill {
   display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 9999px;
   padding: 0.375rem 1rem; margin-bottom: 1rem;
-  background: rgba(34,197,94,.08); border: 1px solid rgba(34,197,94,.2);
+  background: rgba(59,130,246,.09); border: 1px solid rgba(59,130,246,.22);
 }
 .pill-dot {
-  width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--green);
+  width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--accent);
   animation: liveDot 1.6s ease-in-out infinite;
 }
-.pill-text { color: var(--green); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; }
+.pill-text { color: var(--accent); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; }
 
 h1 {
   font-weight: 800; line-height: 1.12; letter-spacing: -0.02em;
   font-size: clamp(1.8125rem, 6.75vw, 2.0625rem);
 }
-.green { color: var(--green); font-weight: 800; }
+.accent { color: var(--accent); font-weight: 800; }
 
 .social-proof {
   display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 1rem;
@@ -229,13 +229,13 @@ h1 {
 .how-steps { display: flex; flex-direction: column; gap: 0.75rem; }
 .step { padding: 18px; display: flex; align-items: center; gap: 1rem; }
 .step-icon {
-  width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; background: rgba(34,197,94,0.1);
-  display: flex; align-items: center; justify-content: center; color: var(--green); flex-shrink: 0;
+  width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; background: rgba(59,130,246,0.12);
+  display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0;
 }
 .step-icon svg { width: 24px; height: 24px; }
 .step h3 { font-weight: 700; font-size: 1rem; color: var(--foreground); }
 .step p { color: var(--muted-foreground); font-size: 0.875rem; margin-top: 2px; }
-.step:nth-child(2) { border-color: var(--green); }
+.step:nth-child(2) { border-color: var(--accent); }
 
 /* Cash out */
 .cashout { position: relative; z-index: 1; max-width: 32rem; margin: 0 auto; padding: 0 18px 2.5rem; text-align: center; }
@@ -271,7 +271,7 @@ footer a:hover { color: var(--foreground); }
 
   <!-- Header -->
   <header class="header">
-    <img src="https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/98/fb/38/98fb388d-c65b-dcdb-bae2-4ab1ef34e554/Placeholder.mill/400x400bb-75.webp" alt="Freecash">
+    <img src="empfohlen-logo.png" alt="Empfohlen">
   </header>
 
   <!-- Hero -->
@@ -282,7 +282,7 @@ footer a:hover { color: var(--foreground); }
     </div>
 
     <h1>
-      <span class="green">Verdiene Geld</span><br>
+      <span class="accent">Verdiene Geld</span><br>
       <span>mit deiner Bildschirmzeit</span>
     </h1>
 
@@ -327,7 +327,7 @@ footer a:hover { color: var(--foreground); }
         </div>
         <div>
           <h3>Lade die App herunter</h3>
-          <p>Installiere Empfohlen und erhalte <span class="green">5€ sofort.</span></p>
+          <p>Installiere Empfohlen und erhalte <span class="accent">5€ sofort.</span></p>
         </div>
       </div>
       <div class="step fc-card">
@@ -336,7 +336,7 @@ footer a:hover { color: var(--foreground); }
         </div>
         <div>
           <h3>WICHTIG:</h3>
-          <p>Erledige <span class="green">2 Aufgaben</span> - für jede gibt's sofort Geld!</p>
+          <p>Erledige <span class="accent">2 Aufgaben</span> - für jede gibt's sofort Geld!</p>
         </div>
       </div>
       <div class="step fc-card">
