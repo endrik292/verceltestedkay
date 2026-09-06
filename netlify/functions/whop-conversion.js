@@ -36,6 +36,29 @@ exports.handler = async function handler(event) {
 
   const accountId = process.env.WHOP_ACCOUNT_ID || DEFAULT_ACCOUNT_ID;
   const eventName = normalizeEventName(getParam(params, "event_name", "event") || DEFAULT_EVENT_NAME);
+
+  const conversionValue = parseNumber(
+    getParam(params, "value", "payout", "revenue", "amount")
+  );
+
+  const configuredMinMetaPayout = Number(process.env.MIN_META_PAYOUT ?? 10);
+  const minMetaPayout = Number.isFinite(configuredMinMetaPayout) ? configuredMinMetaPayout : 10;
+
+  // For CompleteRegistration, only send high-value conversions to Whop / Meta.
+  // Low-value (e.g. $6) conversions still remain recorded in ClickFlare.
+  if (
+    eventName === "complete_registration" &&
+    (typeof conversionValue !== "number" || conversionValue < minMetaPayout)
+  ) {
+    return json(200, {
+      ok: true,
+      skipped: true,
+      reason: "payout_below_meta_threshold",
+      value: conversionValue ?? null,
+      threshold: minMetaPayout,
+    });
+  }
+
   const eventId = buildEventId(eventName, params);
   const payload = compact({
     account_id: accountId,
@@ -45,7 +68,7 @@ exports.handler = async function handler(event) {
     event_time: normalizeEventTime(getParam(params, "event_time", "timestamp", "created_at")),
     url: getParam(params, "url", "lpurl", "landing_page", "source_url"),
     referrer_url: getParam(params, "referrer_url", "referrer", "lp_ref"),
-    value: parseNumber(getParam(params, "value", "payout", "revenue", "amount")),
+    value: conversionValue,
     currency: normalizeCurrency(getParam(params, "currency")),
     context: compact({
       fbclid: getParam(params, "fbclid"),
