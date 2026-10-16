@@ -339,8 +339,15 @@ footer a { color: var(--ink-2); text-decoration: none; }
 </div>
 
 <script>
-// Durchschnittlicher Verdienst pro Spielstunde in €. Mit echten Werten aus deinen Daten ersetzen.
-var EUR_PER_HOUR = 2.5;
+// Verdienst pro Woche / Monat in € je Stunden pro Tag (1–6)
+var EARNINGS = {
+  1: [188, 808],
+  2: [376, 1616],
+  3: [564, 2424],
+  4: [752, 3232],
+  5: [940, 4040],
+  6: [1240, 4500]
+};
 var AFFILIATE_URL = 'https://rdr.gtrx.org/aff_c?offer_id=5410&aff_id=19388';
 
 // Pass ?source=... from this page's URL through to the affiliate link
@@ -361,8 +368,8 @@ function affiliateUrl() {
     var h = +range.value;
     range.style.setProperty('--pct', ((h - range.min) / (range.max - range.min) * 100) + '%');
     hoursVal.textContent = h;
-    weekly.textContent = '€' + Math.round(EUR_PER_HOUR * h * 7).toLocaleString('de-DE');
-    monthly.textContent = '€' + Math.round(EUR_PER_HOUR * h * 30).toLocaleString('de-DE');
+    weekly.textContent = '€' + EARNINGS[h][0].toLocaleString('de-DE');
+    monthly.textContent = '€' + EARNINGS[h][1].toLocaleString('de-DE');
   }
   range.addEventListener('input', update);
   update();
