@@ -1,0 +1,143 @@
+<!DOCTYPE html><html lang="en"><head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"> <link rel="dns-prefetch" href="https://globalvisitlog.com"> <link rel="preconnect" href="https://globalvisitlog.com" crossorigin=""> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""> <link href="https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"> <meta name="theme-color" content="#06071b"> <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> <meta name="apple-mobile-web-app-capable" content="yes"> <title>Verdiene Geld</title> <meta name="description" content="This app is a mobile-first landing page that guides users through unlocking a feature that rewards them for walking."> <meta name="author" content="PlayZone"> <meta property="og:type" content="website"> <meta name="twitter:card" content="summary_large_image"> <script>
+/* Whop-Bruecke: Whop-Visitor-ID (_wuid) + Whop-Klick-Parameter an ClickFlare.
+   1. Die Visitor-ID steht ab dem ersten Moment fest: vorhandenes _wuid (Cookie/localStorage)
+      oder neu im Whop-Format; der Whop-Pixel uebernimmt ein vorhandenes _wuid.
+   2. Sie kommt sofort in die LP-URL, damit ClickFlare sie beim Visit (lpurl) als Tracking-Feld liest.
+   3. CTA-Klick: Ziel ist immer ClickFlares Direct-Klick-URL mit eingebetteten Klick-Daten
+      (redirectUrl mit cep=...), nie der nackte /cf/click-Link, der ein Cookie braucht
+      (Safari/ITP, In-App-Browser). Der CTA wird von React erst spaeter gerendert und vom
+      ClickFlare-Skript deshalb nicht selbst umgeschrieben. */
+(function () {
+  "use strict";
+  var WHOP_PARAMS = ["waid", "wasid", "wacid", "utm_meta_ad_id", "utm_meta_adset_id", "utm_meta_campaign_id",
+    "utm_source", "utm_medium", "utm_campaign", "utm_placement", "utm_content", "utm_adset", "fbclid"];
+  var WAIT_FOR_CLICKFLARE_MS = 10000;
+  var clickflareFailed = false;
+  /* ClickFlare-Tags-Skript nicht ladbar (z. B. Blocker) -> nicht warten */
+  window.addEventListener("error", function (e) {
+    var t = e && e.target;
+    if (t && t.tagName === "SCRIPT" && /\/cf\/tags\//.test(t.src || "")) clickflareFailed = true;
+  }, true);
+
+  function readWuid() {
+    var m = document.cookie.match(/(?:^|;\s*)_wuid=([^;]*)/);
+    if (m && m[1]) return decodeURIComponent(m[1]);
+    try { return localStorage.getItem("_wuid") || undefined; } catch (e) { return undefined; }
+  }
+
+  function newWuid() {
+    var bytes = new Uint8Array(15);
+    (window.crypto || window.msCrypto).getRandomValues(bytes);
+    var s = "";
+    for (var i = 0; i < bytes.length; i++) { var p = bytes[i].toString(36); s += p.length < 2 ? "0" + p : p; }
+    return "wuid_" + s.slice(0, 20);
+  }
+
+  var wuid = readWuid();
+  if (!wuid) {
+    try { wuid = newWuid(); } catch (e) { wuid = undefined; }
+    if (wuid) {
+      document.cookie = "_wuid=" + wuid + "; path=/; max-age=63072000; SameSite=Lax";
+      try { localStorage.setItem("_wuid", wuid); } catch (e) {}
+    }
+  }
+  function currentWuid() { return readWuid() || wuid; }
+
+  if (wuid) {
+    try {
+      var here = new URL(location.href);
+      if (here.searchParams.get("wuid") !== wuid) {
+        here.searchParams.set("wuid", wuid);
+        history.replaceState(history.state, "", here.toString());
+      }
+    } catch (e) {}
+  }
+
+  function extraParams() {
+    var out = [], q = new URLSearchParams(location.search), id = currentWuid();
+    if (id) out.push(["wuid", id]);
+    WHOP_PARAMS.forEach(function (k) { var v = q.get(k); if (v) out.push([k, v]); });
+    return out;
+  }
+
+  function withParams(url, params) {
+    try {
+      var u = new URL(url);
+      params.forEach(function (p) { u.searchParams.set(p[0], p[1]); });
+      return u.toString();
+    } catch (e) { return url; }
+  }
+
+  /* Original-Klick-Link, egal ob nackt, als javascript:window.clickflare.l="..." oder schon umgeschrieben */
+  function originalLink(href) {
+    var m = href.match(/^javascript:window\.clickflare\.l="([^"]*)"/);
+    return m ? m[1] : href;
+  }
+
+  /* gleiche Auswahl wie im ClickFlare-Skript: /cf/click/<n|id|random>, sonst Link 1 */
+  function linkIndex(link, links) {
+    var m = link.match(/\/cf\/click\/([a-zA-Z0-9_-]+)/);
+    if (!m) return 0;
+    var n = Number(m[1]);
+    if (!isNaN(n)) return Math.max(0, n - 1);
+    if (m[1] === "random") return Math.floor(Math.random() * links.length);
+    for (var i = 0; i < links.length; i++) if (links[i].id === m[1]) return i;
+    return 0;
+  }
+
+  function clickTarget(href) {
+    var link = originalLink(href);
+    var params = extraParams();
+    var data = window.clickflare && window.clickflare.data;
+    if (/[?&]cep=/.test(link)) return withParams(link, params);
+    if (data && data.links && data.links.length) {
+      var entry = data.links[linkIndex(link, data.links)] || data.links[0];
+      if (entry.reportingUrl) { try { navigator.sendBeacon(entry.reportingUrl); } catch (e) {} }
+      var target = entry.redirectUrl;
+      try { new URL(link).searchParams.forEach(function (v, k) { params.unshift([k, v]); }); } catch (e) {}
+      return withParams(target, params);
+    }
+    return withParams(link, params); /* Notfall: ClickFlare-Skript nicht geladen (z. B. Blocker) */
+  }
+
+  function whenClickflareReady(cb) {
+    var waited = 0;
+    (function poll() {
+      if ((window.clickflare && window.clickflare.data) || clickflareFailed || waited >= WAIT_FOR_CLICKFLARE_MS) return cb();
+      waited += 100;
+      setTimeout(poll, 100);
+    })();
+  }
+
+  var leadSent = false, navigating = false;
+  document.addEventListener("click", function (ev) {
+    var a = ev.target && ev.target.closest ? ev.target.closest("a[href]") : null;
+    if (!a) return;
+    var href = a.getAttribute("href") || "";
+    if (href.indexOf("/cf/click") === -1) return;
+    if (ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+
+    ev.preventDefault(); /* Navigation uebernehmen wir selbst; React-onClick laeuft trotzdem */
+
+    if (!leadSent && window.whop) {
+      leadSent = true;
+      var id = currentWuid();
+      window.whop.track("lead", id ? { event_id: "lead_" + id } : {});
+    }
+    if (navigating) return;
+    navigating = true;
+    whenClickflareReady(function () {
+      var target = clickTarget(href);
+      window.__whopCtaTarget = target;
+      if (window.__whopCtaNoNavigate) { navigating = false; return; } /* nur fuer Tests */
+      /* kurzer Vorlauf, damit der lead-Beacon sicher raus ist */
+      setTimeout(function () { location.href = target; }, 300);
+    });
+  }, true);
+})();
+</script>
+<script>
+!function(w,d,s,u,n,a,b){if(w[n])return;a=w[n]={q:[],t:+new Date,s:[],o:u,track:function(){a.q.push([+new Date].concat([].slice.call(arguments)))},setScope:function(){a.s=[].slice.call(arguments).filter(function(x){return typeof x==="string"});a.q.push([+new Date,"setScope"].concat(a.s))},scope:function(){var c=[].slice.call(arguments);return{track:function(){a.q.push([+new Date].concat([].slice.call(arguments)).concat([{__scope:c}]))}}}};b=d.createElement(s);b.async=1;b.src=u+"/s.js";d.getElementsByTagName(s)[0].parentNode.insertBefore(b,d.getElementsByTagName(s)[0])}(window,document,"script","https://t.whop.tw","whop");
+whop.setScope("biz_WMqYtzdeJjRJJg");
+whop.track("page");
+</script> <meta property="og:title" content="Verdiene Geld"> <meta name="twitter:title" content="Verdiene Geld"> <meta property="og:description" content="This app is a mobile-first landing page that guides users through unlocking a feature that rewards them for walking."> <meta name="twitter:description" content="This app is a mobile-first landing page that guides users through unlocking a feature that rewards them for walking."> <script type="module" crossorigin="" src="js/index-BV2oeFN4.js"></script> <link rel="stylesheet" crossorigin="" href="css/index-BEcWhl3X.css"></head> <body> <div id="root"></div> <script>!function(){"use strict";var t="lp_ref",n="cpid",e="lpurl",c="https://globalvisitlog.com",r="(?<domain>http(?:s?)://[^/]*)".concat("/cf/click"),a="(?:(?:/(?<cta>[1-9][0-9]*)/?)|(?:/))?",i="^".concat(r).concat(a).concat("(?:$|(\\?.*))"),o='javascript:window.clickflare.l="(?<original_link>'.concat(r).concat(a,'("|(\\?[^"]*"))).*'),s=function(){return new RegExp(i,"")},u=function(){return new RegExp(o,"")};function l(t){var n=function(t){return t.replace(s(),(function(t){for(var n=[],e=1;e<arguments.length;e++)n[e-1]=arguments[e];var r=n[n.length-1].domain;return t.replace(r,c)}))}(t);return'javascript:window.clickflare.l="'.concat(n,'"; void 0;')}function d(t,n){if(n&&t&&n.apply(document,[t]),/loaded|interactive|complete/.test(document.readyState))for(var e=0,c=document.links.length;e<c;e++)if(s().test(document.links[e].href)){var r=document.links[e];window.clickflare.links_replaced.has(r)||(r.href=l(r.href),window.clickflare.links_replaced.add(r))}}var f,h,m,p;!function(r,a){var i=document.onreadystatechange;window.clickflare||(window.clickflare={listeners:{},customParams:{},links_replaced:new Set,addEventListener:function(t,n){var e=this.listeners[t]||[];e.includes(n)||e.push(n),this.listeners[t]=e},dispatchEvent:function(t,n){n&&(this.customParams[t]=n),(this.listeners[t]||[]).forEach((function(t){return t(n)}))},push:function(t,n){n&&(this.customParams[t]=n),(this.listeners[t]||[]).forEach((function(t){return t(n)}))}},document.onreadystatechange=function(t){return d(t,i)},d(null,i),setTimeout((function(){!function(r,a){var i,o=function(r,a){var i=new URL("".concat(c).concat(r));o=a,s="{",u=s+s,l="_",d=l+l,o.startsWith(u)||o.startsWith(d)||i.searchParams.set(n,a);var o,s,u,l,d;return i.searchParams.append(t,document.referrer),i.searchParams.append(e,location.href),i.searchParams.append("lpt",document.title),i.searchParams.append("t",(new Date).getTime().toString()),i.toString()}(r,a),s=document.createElement("script"),l=document.scripts[0];s.async=1,s.src=o,s.onerror=function(){!function(){for(var t=function(t,n){var e=document.links[t];u().test(decodeURI(e.href))&&setTimeout((function(){e&&e.setAttribute("href",function(t){var n=t.match(u());if(n){var e=(n.groups||{}).original_link;return e?e.slice(0,-1):t}return t}(decodeURI(e.href)))}))},n=0,e=document.links.length;n<e;n++)t(n)}()},null===(i=l.parentNode)||void 0===i||i.insertBefore(s,l)}(r,a)})))}("".concat("/cf/tags","/").concat(new URL(window.location.href).searchParams.get("cftmid")||"__CONTAINER_ID__"),(m=new URL(window.location.href).searchParams.get(n),f=new RegExp("(^| )".concat("cf_cpid","=([^;]+)")),p=(h=document.cookie.match(f))&&h.pop()||null,m||p||"6aff38cf849d40f34aea5a10"))}();</script> </body></html>
